@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class PlayerController : MonoBehaviour {
@@ -10,14 +11,42 @@ public class PlayerController : MonoBehaviour {
     public Vector2 moveValue;
     public float speed;
     private int count;
+    private float stime;
+    private float time;
+    private bool gameEnd;
+    private bool btnPressed;
     private int numPickups = 4;
+    string cs;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI winText;
+    public TextMeshProUGUI timeText;
 
     private void Start() {
         count = 0;
+        stime = Time.time;
         winText.text = "";
         SetCountText();
+        gameEnd = false;
+        btnPressed = false;
+        cs = SceneManager.GetActiveScene().name;
+
+    }
+
+    private void Update() {
+        if (Input.anyKey && !btnPressed)
+        {
+            btnPressed = true;
+            stime = Time.time;
+        }
+        if (!gameEnd || Input.anyKeyDown) {
+            time = Time.time - stime;
+            timeText.text = "Time: " + time.ToString("F2");
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(cs);
+        }
+
     }
 
     void OnMove(InputValue value) {
@@ -40,6 +69,8 @@ public class PlayerController : MonoBehaviour {
     private void SetCountText() {
         scoreText.text = "Score: " + count.ToString();
         if (count >= numPickups) {
+            scoreText.text = "";
+            gameEnd = true;
             winText.text = "You win!";
         }
     }
